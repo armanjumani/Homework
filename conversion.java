@@ -40,7 +40,8 @@ public class conversion //extends HttpServlet
 	private JFrame frame;
 	private JPanel header, form, buttons;
 	private JTextField leftText, rightText;
-	private JComboBox<String> combo;
+	private JComboBox<String> combo, accuracy;
+	private int setRoundingPlace = -1;
 	public static void main(String args[]) 
 	{
 		conversion gui = new conversion();
@@ -54,7 +55,7 @@ public class conversion //extends HttpServlet
 	{
 		frame = new JFrame("Conversion GUI");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(500,400);
+		frame.setSize(800,500);
 		frame.setLayout(new BorderLayout());
 		
 		createHeader(frame);
@@ -84,6 +85,7 @@ public class conversion //extends HttpServlet
 		//Add components to panel and then the frame
 		header.add(title, BorderLayout.NORTH);
 		header.add(author, BorderLayout.WEST);
+		header.setBackground(Color.green);
 		
 		frame.add(header, BorderLayout.NORTH);
 	}
@@ -96,17 +98,34 @@ public class conversion //extends HttpServlet
 	{
 		//Initialize array of different options for the user to choose
 		String[] formats = {"Fahrenheit and Celsius","Inch and Centimeter","Feet and Meter",
-				"Mile and Kilometer","Gallon and Liter","Ounce and Gram","Pound and Kilogram"};
-		
+				"Mile and Kilometer","Gallon and Liter","Ounce and Gram","Pound and Kilogram", "Hour and Minute"};
+		String[] decimalPlaces = {"0 decimal places","1 decimal place","2 decimal places","3 decimal places", "4 decimal places"};
 		//Initialize form panel and GridBagLayout variables
 		form = new JPanel();
 		
-		//Initialize combo box, JLabels, and JTextField
+		//Initialize combo boxes, JLabels, and JTextField
 		JLabel leftLabel = new JLabel("Please select an option");
 		JLabel rightLabel = new JLabel("Please select an option");
+		JLabel conversionLabel = new JLabel("Conversions:");
+		JLabel accuracyLabel = new JLabel("Accuracy:");
 		
 		leftText = new JTextField(6);
 		rightText = new JTextField(6);
+		
+		accuracy = new JComboBox<String>(decimalPlaces);
+		accuracy.setSelectedIndex(-1);
+		
+		//Add actionListener to combo box and rounding decimals
+		accuracy.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				JComboBox<String> cb = (JComboBox<String>)e.getSource();
+				int selectionIndex = cb.getSelectedIndex();
+				//change the integer setRoundingPlace to the selected integer otherwise return an error message
+				setRoundingPlace = selectionIndex;
+			}
+		});
 		
 		combo = new JComboBox<String>(formats);
 		combo.setSelectedIndex(-1);
@@ -116,7 +135,7 @@ public class conversion //extends HttpServlet
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				JComboBox cb = (JComboBox)e.getSource();
+				JComboBox<String> cb = (JComboBox<String>)e.getSource();
 				int selectionIndex = cb.getSelectedIndex();
 				//change the text based on what the user selected
 				if(selectionIndex == 0) 
@@ -170,13 +189,22 @@ public class conversion //extends HttpServlet
 					leftText.setText("");
 					rightText.setText("");
 				}
-				else 
+				else if(selectionIndex == 6)
 				{
 					leftLabel.setText("Pound (lb):");
 					rightLabel.setText("Kilogram (kg):");
 					
 					leftText.setText("");
 					rightText.setText("");
+				}
+				else if(selectionIndex == 7) 
+				{
+					leftLabel.setText("Hours (hr):");
+					rightLabel.setText("Minutes (min):");
+					
+					leftText.setText("");
+					rightText.setText("");
+					
 				}
 			}
 			
@@ -186,18 +214,22 @@ public class conversion //extends HttpServlet
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
 		form.setLayout(layout);
+		form.setBackground(Color.cyan);
 		
-		addComponent(combo, form, layout, gbc, 7, 0, 3, 1, GridBagConstraints.CENTER);
-		addComponent(leftLabel, form, layout, gbc, 1, 5, 1, 1, GridBagConstraints.LINE_START);
-		addComponent(leftText, form, layout, gbc, 2, 5, 1, 1, GridBagConstraints.LINE_START);
-		addComponent(rightLabel, form, layout, gbc, 12, 5, 1, 1, GridBagConstraints.LINE_END);
-		addComponent(rightText, form, layout, gbc, 13, 5, 1, 1, GridBagConstraints.LINE_END);
+		addComponent(combo, form, layout, gbc, 7, 0, 3, 1, GridBagConstraints.CENTER, GridBagConstraints.NONE);
+		addComponent(conversionLabel, form, layout,gbc, 5, 0, 1 ,1, GridBagConstraints.LINE_START, GridBagConstraints.NONE);
+		addComponent(leftLabel, form, layout, gbc, 1, 5, 1, 1, GridBagConstraints.LINE_START, GridBagConstraints.NONE);
+		addComponent(leftText, form, layout, gbc, 2, 5, 1, 1, GridBagConstraints.LINE_START, GridBagConstraints.BOTH);
+		addComponent(rightLabel, form, layout, gbc, 12, 5, 1, 1, GridBagConstraints.LINE_END, GridBagConstraints.NONE);
+		addComponent(rightText, form, layout, gbc, 13, 5, 1, 1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH);
+		addComponent(accuracy, form, layout, gbc, 7, 7, 3, 1,GridBagConstraints.CENTER,GridBagConstraints.BOTH);
+		addComponent(accuracyLabel, form, layout, gbc, 5, 7, 1, 1, GridBagConstraints.LINE_START, GridBagConstraints.BOTH);
 		
 		frame.add(form, BorderLayout.CENTER);
 		
 	}
 	private void addComponent(JComponent component, JPanel panel, GridBagLayout layout, GridBagConstraints gbc, 
-			int gridx, int gridy, int gridwidth, int gridheight, int anchor) 
+			int gridx, int gridy, int gridwidth, int gridheight, int anchor, int fill) 
 	{
 		gbc.gridx = gridx;
 		gbc.gridy = gridy;
@@ -205,7 +237,7 @@ public class conversion //extends HttpServlet
 		gbc.gridwidth = gridwidth;
 		gbc.gridheight = gridheight;;
 		
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.fill = fill;
 		gbc.anchor = anchor;
 		
 		
@@ -227,6 +259,11 @@ public class conversion //extends HttpServlet
 				int selectionIndex = combo.getSelectedIndex();
 				boolean leftExists = leftText.getText() != null && leftText.getText().length() > 0;
 				boolean rightExists = rightText.getText() != null && rightText.getText().length() > 0;
+				//Check to make sure the user selected decimal places
+				if(setRoundingPlace == -1) 
+				{
+					JOptionPane.showMessageDialog(frame, "Please select accuracy of conversion!", "ERROR", JOptionPane.ERROR_MESSAGE);
+				}
 				//Temperature Calculation
 				if (selectionIndex == 0) 
 				{
@@ -336,7 +373,7 @@ public class conversion //extends HttpServlet
 					}
 				}
 				//Medium Weight
-				else
+				else if(selectionIndex == 6)
 				{
 					if(leftExists && rightExists) 
 					{
@@ -350,6 +387,24 @@ public class conversion //extends HttpServlet
 					else if(rightExists) 
 					{
 						String result = convertK2Lb(rightText.getText()) + "";
+						leftText.setText(result);
+					}
+				}
+				
+				else if(selectionIndex == 7) 
+				{
+					if(leftExists && rightExists) 
+					{
+						JOptionPane.showMessageDialog(frame, "Please clear at least one side to properly convert", "ERROR", JOptionPane.ERROR_MESSAGE);
+					}
+					else if(leftExists) 
+					{
+						String result = convertHr2Min(leftText.getText()) + "";
+						rightText.setText(result);
+					}
+					else if(rightExists) 
+					{
+						String result = convertMin2Hr(rightText.getText()) + "";
 						leftText.setText(result);
 					}
 				}
@@ -367,6 +422,7 @@ public class conversion //extends HttpServlet
 		
 		buttons.add(submit);
 		buttons.add(clear);
+		buttons.setBackground(Color.green);
 		frame.add(buttons, BorderLayout.SOUTH);
 	}
 /*
@@ -659,19 +715,22 @@ public void doPost (HttpServletRequest request, HttpServletResponse response)
 }
 */
 
+
 private float convertF2C (String FAsStr)
 {  // Convert farenheit to celsius
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf(FAsStr).floatValue());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) ( ( (num1-32.0) * 5.0) / 9.0);
-   // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   // Back to x digits
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return (num2);
 }
 
@@ -679,15 +738,17 @@ private float convertC2F (String CAsStr)
 {  // Convert celsius to farenheit
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (CAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) ( (num1 * 9.0 / 5.0) + 32.0);
-   // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   // Back to x digits
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -696,15 +757,17 @@ private float convertIn2Cm (String inAsStr)
 {  // Convert inches to centimeters
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (inAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 * 2.54);
-   // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   // Back to x digits
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -712,15 +775,17 @@ private float convertCm2In (String cmAsStr)
 {  // Convert centimeters to inches
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (cmAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 * 0.3937);
-   // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   // Back to x digits
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -729,15 +794,17 @@ private float convertF2M (String ftAsStr)
 {  // Convert feet to meters
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (ftAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 * 0.3048);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -745,15 +812,17 @@ private float convertM2F (String mAsStr)
 {  // Convert meters to feet
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (mAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 / 0.3048);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -762,15 +831,17 @@ private float convertM2K (String miAsStr)
 {  // Convert miles to kilometers
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (miAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 * 1.609);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -778,15 +849,17 @@ private float convertK2M (String kmAsStr)
 {  // Convert kilometers to miles
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (kmAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 * 0.6214);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -795,15 +868,17 @@ private float convertG2L (String galAsStr)
 {  // Convert gallons to liters
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (galAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 * 3.785);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -811,15 +886,17 @@ private float convertL2G (String LAsStr)
 {  // Convert liters to gallons
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (LAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 / 3.785);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -828,15 +905,17 @@ private float convertOz2G (String ozAsStr)
 {  // Convert ounces to grams
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (ozAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 * 28.35);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -844,15 +923,17 @@ private float convertG2Oz (String gAsStr)
 {  // Convert grams to ounces
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (gAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 / 28.35);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -861,15 +942,17 @@ private float convertLb2K (String lbAsStr)
 {  // Convert pounds to kilograms
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   // Set value of num1
    num1 = (Float.valueOf (lbAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
+   /*
+   n    = Math.round(num1 * (float)Math.pow(10, setRoundingPlace));
+   num1 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   */
    // Convert
    num2 = (float) (num1 * 0.4536);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
 }
 
@@ -877,16 +960,42 @@ private float convertK2Lb (String kgAsStr)
 {  // Convert kilograms to pounds
    float num1, num2; // temporary variables
    int n; // temporary variable
-   // Round to 2 digits past decimal
+   //Set value of num1
    num1 = (Float.valueOf (kgAsStr).floatValue ());
-   n    = Math.round(num1 * (float)100.0);
-   num1 = (float) (n / (float)100.0);
    // Convert
    num2 = (float) (num1 * 2.205);
    // Back to 2 digits
-   n    = Math.round(num2 * (float)100.0);
-   num2 = (float) (n / (float)100.0);
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
    return(num2);
+}
+
+private float convertHr2Min(String hrAsStr) 
+{	//Convert hours to minutes
+	float num1, num2; // temporary variables
+	int n; // temporary variable
+	//Set value of num1
+	num1 = (Float.valueOf (hrAsStr).floatValue ());
+	// Convert
+	num2 = (float) (num1 * 60.0);
+	// Back to x digits
+	n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+	num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+	return(num2);
+}
+
+private float convertMin2Hr(String minAsStr) 
+{	//Convert minutes to hours
+	float num1, num2; // temporary variables
+	int n; // temporary variable
+	// Round to 2 digits past decimal
+	num1 = (Float.valueOf (minAsStr).floatValue ());
+	// Convert
+	num2 = (float) (num1 / 60.0);
+	// Back to 2 digits
+	n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+	num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+	return(num2);
 }
 
 }
