@@ -41,7 +41,7 @@ public class conversion //extends HttpServlet
 	private JPanel header, form, buttons;
 	private JTextField leftText, rightText;
 	private JComboBox<String> combo, accuracy;
-	private int setRoundingPlace = -1;
+	protected int setRoundingPlace = -1;
 	public static void main(String args[]) 
 	{
 		conversion gui = new conversion();
@@ -98,7 +98,8 @@ public class conversion //extends HttpServlet
 	{
 		//Initialize array of different options for the user to choose
 		String[] formats = {"Fahrenheit and Celsius","Inch and Centimeter","Feet and Meter",
-				"Mile and Kilometer","Gallon and Liter","Ounce and Gram","Pound and Kilogram", "Hour and Minute"};
+				"Mile and Kilometer","Gallon and Liter","Ounce and Gram","Pound and Kilogram", "Hour and Minute",
+				"Miles per hour and Kilometers per hour", "Kelvin and Celsius"};
 		String[] decimalPlaces = {"0 decimal places","1 decimal place","2 decimal places","3 decimal places", "4 decimal places"};
 		//Initialize form panel and GridBagLayout variables
 		form = new JPanel();
@@ -205,6 +206,22 @@ public class conversion //extends HttpServlet
 					leftText.setText("");
 					rightText.setText("");
 					
+				}
+				else if(selectionIndex == 8) 
+				{
+					leftLabel.setText("Miles per hour(mph):");
+					rightLabel.setText("Kilometers per hour(kph):");
+					
+					leftText.setText("");
+					rightText.setText("");
+				}
+				else if(selectionIndex == 9) 
+				{
+					leftLabel.setText("Kelvin (k):");
+					rightLabel.setText("Celsius (c):");
+					
+					leftText.setText("");
+					rightText.setText("");
 				}
 			}
 			
@@ -405,6 +422,42 @@ public class conversion //extends HttpServlet
 					else if(rightExists) 
 					{
 						String result = convertMin2Hr(rightText.getText()) + "";
+						leftText.setText(result);
+					}
+				}
+				//Speed
+				else if(selectionIndex == 8) 
+				{
+					if(leftExists && rightExists) 
+					{
+						JOptionPane.showMessageDialog(frame, "Please clear at least one side to properly convert", "ERROR", JOptionPane.ERROR_MESSAGE);
+					}
+					else if(leftExists) 
+					{
+						String result = convertMph2Kph(leftText.getText()) + "";
+						rightText.setText(result);
+					}
+					else if(rightExists) 
+					{
+						String result = convertKph2Mph(rightText.getText()) + "";
+						leftText.setText(result);
+					}
+				}
+				//Kelvin to Celsius
+				else if(selectionIndex == 9) 
+				{
+					if(leftExists && rightExists) 
+					{
+						JOptionPane.showMessageDialog(frame, "Please clear at least one side to properly convert", "ERROR", JOptionPane.ERROR_MESSAGE);
+					}
+					else if(leftExists) 
+					{
+						String result = convertK2C(leftText.getText()) + "";
+						rightText.setText(result);
+					}
+					else if(rightExists) 
+					{
+						String result = convertC2K(rightText.getText()) + "";
 						leftText.setText(result);
 					}
 				}
@@ -716,7 +769,7 @@ public void doPost (HttpServletRequest request, HttpServletResponse response)
 */
 
 
-private float convertF2C (String FAsStr)
+protected float convertF2C (String FAsStr)
 {  // Convert farenheit to celsius
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -734,7 +787,7 @@ private float convertF2C (String FAsStr)
    return (num2);
 }
 
-private float convertC2F (String CAsStr)
+protected float convertC2F (String CAsStr)
 {  // Convert celsius to farenheit
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -753,7 +806,7 @@ private float convertC2F (String CAsStr)
 }
 
 // small distance
-private float convertIn2Cm (String inAsStr)
+protected float convertIn2Cm (String inAsStr)
 {  // Convert inches to centimeters
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -771,7 +824,7 @@ private float convertIn2Cm (String inAsStr)
    return(num2);
 }
 
-private float convertCm2In (String cmAsStr)
+protected float convertCm2In (String cmAsStr)
 {  // Convert centimeters to inches
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -790,7 +843,7 @@ private float convertCm2In (String cmAsStr)
 }
 
 // medium distance
-private float convertF2M (String ftAsStr)
+protected float convertF2M (String ftAsStr)
 {  // Convert feet to meters
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -808,7 +861,7 @@ private float convertF2M (String ftAsStr)
    return(num2);
 }
 
-private float convertM2F (String mAsStr)
+protected float convertM2F (String mAsStr)
 {  // Convert meters to feet
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -827,7 +880,7 @@ private float convertM2F (String mAsStr)
 }
 
 // large distance
-private float convertM2K (String miAsStr)
+protected float convertM2K (String miAsStr)
 {  // Convert miles to kilometers
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -845,7 +898,7 @@ private float convertM2K (String miAsStr)
    return(num2);
 }
 
-private float convertK2M (String kmAsStr)
+protected float convertK2M (String kmAsStr)
 {  // Convert kilometers to miles
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -864,7 +917,7 @@ private float convertK2M (String kmAsStr)
 }
 
 // volume
-private float convertG2L (String galAsStr)
+protected float convertG2L (String galAsStr)
 {  // Convert gallons to liters
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -882,7 +935,7 @@ private float convertG2L (String galAsStr)
    return(num2);
 }
 
-private float convertL2G (String LAsStr)
+protected float convertL2G (String LAsStr)
 {  // Convert liters to gallons
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -901,7 +954,7 @@ private float convertL2G (String LAsStr)
 }
 
 // small weight
-private float convertOz2G (String ozAsStr)
+protected float convertOz2G (String ozAsStr)
 {  // Convert ounces to grams
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -919,7 +972,7 @@ private float convertOz2G (String ozAsStr)
    return(num2);
 }
 
-private float convertG2Oz (String gAsStr)
+protected float convertG2Oz (String gAsStr)
 {  // Convert grams to ounces
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -938,7 +991,7 @@ private float convertG2Oz (String gAsStr)
 }
 
 // medium weight
-private float convertLb2K (String lbAsStr)
+protected float convertLb2K (String lbAsStr)
 {  // Convert pounds to kilograms
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -956,7 +1009,7 @@ private float convertLb2K (String lbAsStr)
    return(num2);
 }
 
-private float convertK2Lb (String kgAsStr)
+protected float convertK2Lb (String kgAsStr)
 {  // Convert kilograms to pounds
    float num1, num2; // temporary variables
    int n; // temporary variable
@@ -970,7 +1023,7 @@ private float convertK2Lb (String kgAsStr)
    return(num2);
 }
 
-private float convertHr2Min(String hrAsStr) 
+protected float convertHr2Min(String hrAsStr) 
 {	//Convert hours to minutes
 	float num1, num2; // temporary variables
 	int n; // temporary variable
@@ -984,7 +1037,7 @@ private float convertHr2Min(String hrAsStr)
 	return(num2);
 }
 
-private float convertMin2Hr(String minAsStr) 
+protected float convertMin2Hr(String minAsStr) 
 {	//Convert minutes to hours
 	float num1, num2; // temporary variables
 	int n; // temporary variable
@@ -996,6 +1049,62 @@ private float convertMin2Hr(String minAsStr)
 	n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
 	num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
 	return(num2);
+}
+
+protected float convertMph2Kph (String mphAsStr)
+{  // Convert miles per hour to kilometers per hour
+   float num1, num2; // temporary variables
+   int n; // temporary variable
+   // Set value of num1
+   num1 = (Float.valueOf (mphAsStr).floatValue ());
+   // Convert
+   num2 = (float) (num1 * 1.609344);
+   // Back to 2 digits
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   return(num2);
+}
+
+protected float convertKph2Mph (String kphAsStr)
+{  // Convert kilometers per hour to miles per hour
+   float num1, num2; // temporary variables
+   int n; // temporary variable
+   // Set value of num1
+   num1 = (Float.valueOf (kphAsStr).floatValue ());
+   // Convert
+   num2 = (float) (num1 / 1.609344);
+   // Back to 2 digits
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   return(num2);
+}
+
+protected float convertK2C (String kAsStr)
+{  // Convert Kelvin to Celsius
+   float num1, num2; // temporary variables
+   int n; // temporary variable
+   // Set value of num1
+   num1 = (Float.valueOf (kAsStr).floatValue ());
+   // Convert
+   num2 = (float) (num1 - 273.15);
+   // Back to 2 digits
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   return(num2);
+}
+
+protected float convertC2K (String cAsStr)
+{  // Convert Celsius to Kelvin
+   float num1, num2; // temporary variables
+   int n; // temporary variable
+   // Set value of num1
+   num1 = (Float.valueOf (cAsStr).floatValue ());
+   // Convert
+   num2 = (float) (num1 + 273.15);
+   // Back to 2 digits
+   n    = Math.round(num2 * (float)Math.pow(10, setRoundingPlace));
+   num2 = (float) (n / (float)Math.pow(10, setRoundingPlace));
+   return(num2);
 }
 
 }
